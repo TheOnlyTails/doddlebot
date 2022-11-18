@@ -16,7 +16,9 @@ import net.dv8tion.jda.api.events.session.ReadyEvent
 import org.jetbrains.exposed.sql.Database
 import com.theonlytails.doddlebot.commands.roles as rolesCmd
 
-val dotenv = dotenv()
+val dotenv = dotenv {
+    ignoreIfMissing = true
+}
 
 val jda = light(dotenv["DODDLEBOT_TOKEN"], enableCoroutines = true)
 val logger by SLF4J
