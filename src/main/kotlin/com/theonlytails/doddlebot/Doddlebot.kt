@@ -1,25 +1,35 @@
 package com.theonlytails.doddlebot
 
 import com.theonlytails.doddlebot.commands.*
-import dev.minn.jda.ktx.SLF4J
-import dev.minn.jda.ktx.interactions.choice
-import dev.minn.jda.ktx.interactions.option
-import dev.minn.jda.ktx.interactions.subcommand
-import dev.minn.jda.ktx.light
-import dev.minn.jda.ktx.listener
+import com.theonlytails.doddlebot.events.newMember
+import com.theonlytails.doddlebot.events.updateScore
+import dev.minn.jda.ktx.events.listener
+import dev.minn.jda.ktx.interactions.commands.option
+import dev.minn.jda.ktx.interactions.commands.subcommand
+import dev.minn.jda.ktx.jdabuilder.light
 import dev.minn.jda.ktx.messages.SendDefaults
+import dev.minn.jda.ktx.util.SLF4J
 import io.github.cdimascio.dotenv.dotenv
-import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.interactions.commands.Command
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.events.session.ReadyEvent
+import org.jetbrains.exposed.sql.Database
 import com.theonlytails.doddlebot.commands.roles as rolesCmd
 
 val dotenv = dotenv()
 
-fun main() {
-    val logger by SLF4J
+val jda = light(dotenv["DODDLEBOT_TOKEN"], enableCoroutines = true)
+val logger by SLF4J
 
-    val jda = light(dotenv["DODDLEBOT_TOKEN"], enableCoroutines = true)
+fun main() {
     SendDefaults.ephemeral = true
+
+    Database.connect(
+        url = "jdbc:postgresql://db.ktsiennzyfninrpbbyzm.supabase.co:5432/postgres",
+        driver = "org.postgresql.Driver",
+        user = "postgres",
+        password = dotenv["SUPABASE_PASSWORD"]
+    )
 
     jda.listener<ReadyEvent> {
         it.jda.apply {
@@ -34,8 +44,15 @@ fun main() {
                 }
             } calls leaderboard
 
-            command("roles", "Open the roles menu and add yourself some roles!") {
-                subcommand("remove", "Open the roles menu and remove roles you don't want.") calls rolesRemove
+            command("score", "Shows your current score.") {
+                option<User>("member", "the member") {
+                    isRequired = false
+                }
+            } calls score
+
+            command("roles", "Commands related to roles") {
+                subcommand("add", "Open the roles menu and give yourself some roles!")
+                subcommand("remove", "Open the roles menu and remove roles you don't want.")
             } calls rolesCmd
 
             command("serious", "Gain/remove access to the #serious channel.") calls serious
@@ -43,6 +60,9 @@ fun main() {
             command("serverinfo", "Get some info about the server") calls serverInfo
 
             registerCommands()
+
+            newMember()
+            updateScore()
         }
     }
 }

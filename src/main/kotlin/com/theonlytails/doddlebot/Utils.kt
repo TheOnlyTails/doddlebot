@@ -1,15 +1,12 @@
 package com.theonlytails.doddlebot
 
-import dev.minn.jda.ktx.InlineEmbed
-import dev.minn.jda.ktx.interactions.Command
-import dev.minn.jda.ktx.interactions.slash
-import dev.minn.jda.ktx.interactions.updateCommands
-import dev.minn.jda.ktx.onCommand
+import dev.minn.jda.ktx.events.onCommand
+import dev.minn.jda.ktx.interactions.commands.Command
+import dev.minn.jda.ktx.messages.InlineEmbed
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.commands.Command
+import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction
 import java.awt.Color
 
 typealias CommandAction = GenericCommandInteractionEvent.() -> Unit
@@ -23,14 +20,11 @@ fun command(name: String, description: String, builder: SlashCommandData.() -> U
 }
 
 fun JDA.registerCommands() {
-    val setup: CommandListUpdateAction.() -> Unit = {
-        commandsQueue.forEach { (command, action) ->
-            slash(command.name, command.description, action)
-        }
+    commandsQueue.forEach { (command, action) ->
+        upsertCommand(
+            Commands.slash(command.name, command.description).apply(action)
+        ).queue()
     }
-
-    getGuildById(758284094827266048)!!.updateCommands(setup).queue()
-//    updateCommands(setup).queue()
 }
 
 context(JDA)

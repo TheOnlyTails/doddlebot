@@ -1,9 +1,24 @@
 package com.theonlytails.doddlebot
 
-import com.mongodb.client.MongoDatabase
-import org.litote.kmongo.KMongo
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
+import java.util.UUID
 
-data class User(val id: Long, val name: String, val score: Int)
+class User(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<User>(Table)
 
-val client = KMongo.createClient(dotenv["MONGO_URI"])
-val doddlebotDatabase: MongoDatabase = client.getDatabase("doddlebot")
+    var name by Table.name
+    var score by Table.score
+    var discordId by Table.discordId
+
+    object Table : UUIDTable("users") {
+        val name = varchar("name", 40).default("")
+        val score = integer("score").default(0)
+        val discordId = long("discord_id")
+    }
+}

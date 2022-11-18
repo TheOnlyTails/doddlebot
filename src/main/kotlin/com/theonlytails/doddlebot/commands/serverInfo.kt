@@ -4,13 +4,13 @@ import com.theonlytails.doddlebot.CommandAction
 import com.theonlytails.doddlebot.bold
 import com.theonlytails.doddlebot.dodieYellow
 import com.theonlytails.doddlebot.underline
-import dev.minn.jda.ktx.Embed
+import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
 
 val serverInfo: CommandAction = {
     val guild = guild
     if (guild != null) {
-        reply_(embed = Embed {
+        reply_(embeds = listOf(Embed {
             title = "${guild.name} Details".bold().underline()
             thumbnail = guild.iconUrl
             dodieYellow()
@@ -19,9 +19,9 @@ val serverInfo: CommandAction = {
             field("Bots", "${guild.members.count { it.user.isBot }} Bots")
             field(
                 "Channels", """${guild.channels.count { it.type.isAudio }} Voice & Stage 
-                |${guild.channels.count { it.type.isMessage }} Text
-                |${guild.channels.count { it.type.isThread }} Threads
-                |""".trimMargin()
+                    |${guild.channels.count { it.type.isMessage }} Text
+                    |${guild.channels.count { it.type.isThread }} Threads
+                    |""".trimMargin()
             )
             field {
                 name = "Mods"
@@ -35,6 +35,6 @@ val serverInfo: CommandAction = {
                     .filter { it.roles.any { role -> role.name == "Manager joshes" } }
                     .joinToString(", ") { "<@${it.user.id}>" }
             }
-        }).queue()
+        })).queue()
     }
 }

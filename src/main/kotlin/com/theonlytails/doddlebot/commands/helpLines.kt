@@ -2,7 +2,7 @@ package com.theonlytails.doddlebot.commands
 
 import com.theonlytails.doddlebot.CommandAction
 import com.theonlytails.doddlebot.dodieYellow
-import dev.minn.jda.ktx.Embed
+import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
 
 val helpLines: CommandAction = {

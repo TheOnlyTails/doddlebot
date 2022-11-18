@@ -3,12 +3,11 @@ package com.theonlytails.doddlebot.commands
 import com.theonlytails.doddlebot.CommandAction
 import com.theonlytails.doddlebot.bold
 import com.theonlytails.doddlebot.dodieYellow
-import dev.minn.jda.ktx.Embed
+import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
-import java.awt.Color
 
 val rules: CommandAction = {
-    reply_(embed = Embed {
+    reply_(embeds = listOf(Embed {
         dodieYellow()
         title = "Rules".bold()
         field("Please do", "Use the correct channels when sending messages, and think before @ing, or DMing a member")
@@ -26,5 +25,5 @@ val rules: CommandAction = {
                 |Swearing is allowed so long as it is not too much or directed at someone with the intention of causing offense/upset.
                 |""".trimMargin()
         )
-    }).queue()
+    })).queue()
 }
