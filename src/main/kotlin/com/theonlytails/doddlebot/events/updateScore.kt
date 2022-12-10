@@ -1,36 +1,29 @@
 package com.theonlytails.doddlebot.events
 
 import com.theonlytails.doddlebot.User
-import com.theonlytails.doddlebot.User.Table.name
-import com.theonlytails.doddlebot.User.Table.score
-import com.theonlytails.doddlebot.jda
-import com.theonlytails.doddlebot.logger
+import com.theonlytails.doddlebot.client
+import com.theonlytails.doddlebot.getBy
 import dev.minn.jda.ktx.events.listener
+import io.github.jan.supabase.postgrest.postgrest
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.MessageType
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
 
-fun updateScore() {
-    jda.listener<MessageReceivedEvent> {
-        if (!it.author.isBot &&
-            it.member?.roles?.contains(it.guild.getRoleById(membersRoleId)) == true &&
-            it.message.type == MessageType.DEFAULT
-        ) {
-            transaction {
-                if (User.find(User.Table.discordId eq it.author.idLong).empty()) {
-                    User.new {
-                        name = it.author.name
-                        discordId = it.author.idLong
-                    }
-                }
-            }
+fun JDA.updateScore() = listener<MessageReceivedEvent> {
+    val usersTable = client.postgrest["users"]
 
-            transaction {
-                User.find(User.Table.discordId eq it.author.idLong).forEach { user ->
-                    user.score++
-                }
-            }
+    val user = usersTable.getBy(User::discordId, it.author.idLong)
+
+    if (!it.author.isBot &&
+        it.member?.roles?.contains(it.guild.getRoleById(membersRoleId)) == true &&
+        it.message.type == MessageType.DEFAULT
+    ) {
+        if (user == null) {
+            usersTable.insert(User(name = it.author.name, discordId = it.author.idLong))
         }
     }
+
+    usersTable.update(update = {
+        User::score setTo (user?.score ?: 0) + 1
+    }, filter = { User::discordId eq it.author.idLong })
 }

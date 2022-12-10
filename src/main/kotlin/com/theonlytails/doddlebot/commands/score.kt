@@ -2,21 +2,22 @@ package com.theonlytails.doddlebot.commands
 
 import com.theonlytails.doddlebot.CommandAction
 import com.theonlytails.doddlebot.User
+import com.theonlytails.doddlebot.client
 import com.theonlytails.doddlebot.dodieYellow
 import dev.minn.jda.ktx.interactions.components.getOption
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
-import net.dv8tion.jda.api.entities.Member
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import io.github.jan.supabase.postgrest.postgrest
 import net.dv8tion.jda.api.entities.User as JDAUser
-import org.jetbrains.exposed.sql.transactions.transaction
 
 val score: CommandAction = {
     val userOption = getOption<JDAUser>("member") ?: user
 
-    val score = transaction {
-        User.find(User.Table.discordId eq userOption.idLong).first().score
-    }
+    val score = client.postgrest["users"]
+        .select { User::discordId eq userOption.idLong }
+        .decodeList<User>()
+        .first()
+        .score
 
     reply_(embeds = listOf(
         Embed {

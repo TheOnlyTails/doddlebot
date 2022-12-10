@@ -1,24 +1,32 @@
 package com.theonlytails.doddlebot
 
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.UUIDEntity
-import org.jetbrains.exposed.dao.UUIDEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.dao.id.UUIDTable
-import java.util.UUID
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import java.util.*
 
-class User(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<User>(Table)
+val client = createSupabaseClient("https://rbvnxftktiwfwzlhqbvj.supabase.co", dotenv["SUPABASE_PASSWORD"]) {
+    install(Postgrest)
+}
 
-    var name by Table.name
-    var score by Table.score
-    var discordId by Table.discordId
+@Serializable
+data class User(
+    @Serializable(with = UUIDSerializer::class) val id: UUID = UUID.randomUUID(),
+    val name: String,
+    val score: Int = 0,
+    val discordId: Long
+)
 
-    object Table : UUIDTable("users") {
-        val name = varchar("name", 40).default("")
-        val score = integer("score").default(0)
-        val discordId = long("discord_id")
-    }
+object UUIDSerializer : KSerializer<UUID> {
+    override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+
+    override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
+
 }

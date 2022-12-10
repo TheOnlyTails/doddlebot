@@ -7,9 +7,7 @@ import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.interactions.components.SelectOption
 import dev.minn.jda.ktx.interactions.components.StringSelectMenu
 import dev.minn.jda.ktx.interactions.components.row
-import dev.minn.jda.ktx.messages.Embed
-import dev.minn.jda.ktx.messages.editMessage_
-import dev.minn.jda.ktx.messages.reply_
+import dev.minn.jda.ktx.messages.*
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
@@ -45,18 +43,22 @@ val roles: CommandAction = {
 
         reply_(
             embeds = listOf(Embed {
-                if (subcommandName == "add") {
-                    title = "Add Roles"
-                    description = """
-                        Please select which roles to add from each category (you can select multiple).
-                        The roles are added automatically when closing each menu.
-                        """.trimIndent()
-                } else if (subcommandName == "remove") {
-                    title = "Remove Roles"
-                    description = """
-                        Please select which roles to remove from each category (you can select multiple).
-                        The roles are removed automatically when closing each menu.
-                        """.trimIndent()
+                when (subcommandName) {
+                    "add" -> {
+                        title = "Add Roles"
+                        description = """
+                                    Please select which roles to add from each category (you can select multiple).
+                                    The roles are added automatically when closing each menu.
+                                    """.trimIndent()
+                    }
+
+                    "remove" -> {
+                        title = "Remove Roles"
+                        description = """
+                                    Please select which roles to remove from each category (you can select multiple).
+                                    The roles are removed automatically when closing each menu.
+                                    """.trimIndent()
+                    }
                 }
                 dodieYellow()
             }),
@@ -65,14 +67,26 @@ val roles: CommandAction = {
 
         jda.listener<StringSelectInteractionEvent> { menuEvent ->
             if (menuEvent.componentId.startsWith("menu:roles") && menuEvent.componentId.endsWith(interaction.id)) {
-                menuEvent.values.forEach { role ->
-                    val guildRole = guild.getRoleById(role)
-                        ?: throw IllegalArgumentException("Could not find a role with this ID: $role")
+                menuEvent.values.forEach { roleId ->
+                    val guildRole = guild.getRoleById(roleId)
+                        ?: throw IllegalArgumentException("Could not find a role with this ID: $roleId")
 
-                    if (subcommandName == "add") {
-                        guild.addRoleToMember(member, guildRole).queue()
-                    } else if (subcommandName == "remove") {
-                        guild.removeRoleFromMember(member, guildRole).queue()
+                    val actionVerb = when (subcommandName) {
+                        "add" -> "Added"
+                        "remove" -> "Removed"
+                        else -> throw IllegalArgumentException("Got an unexpected subcommand for /roles: $subcommandName")
+                    }
+                    menuEvent.editMessage_(
+                        embeds = menuEvent.message.embeds + listOf(Embed {
+                            dodieYellow()
+                            title = "$actionVerb a Role!"
+                            field(value = "$actionVerb <@&$roleId>!")
+                        })
+                    ).queue()
+
+                    when (subcommandName) {
+                        "add" -> guild.addRoleToMember(member, guildRole).queue()
+                        "remove" -> guild.removeRoleFromMember(member, guildRole).queue()
                     }
                 }
             }
