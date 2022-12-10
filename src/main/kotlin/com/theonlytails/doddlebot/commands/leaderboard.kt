@@ -27,6 +27,7 @@ val leaderboard: CommandAction = {
             field {
                 name = "${index + 1}. ${user.name}"
                 value = "${user.score} points"
+                inline = false
             }
         }
     })).queue()
