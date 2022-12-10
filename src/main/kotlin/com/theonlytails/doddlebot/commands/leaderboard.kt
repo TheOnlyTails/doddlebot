@@ -17,7 +17,7 @@ val leaderboard: CommandAction = {
         .decodeList<User>()
         .asSequence()
         .take(amount)
-        .sortedBy { it.score }
+        .sortedByDescending { it.score }
 
     reply_(embeds = listOf(Embed {
         title = "doddlecord leaderboard"
