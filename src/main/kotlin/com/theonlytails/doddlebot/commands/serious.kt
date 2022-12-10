@@ -1,7 +1,6 @@
 package com.theonlytails.doddlebot.commands
 
 import com.theonlytails.doddlebot.CommandAction
-import com.theonlytails.doddlebot.Role
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.messages.editMessage_
 import dev.minn.jda.ktx.messages.into

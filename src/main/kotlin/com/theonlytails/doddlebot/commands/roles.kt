@@ -5,7 +5,6 @@ import com.theonlytails.doddlebot.Role
 import com.theonlytails.doddlebot.dodieYellow
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.interactions.components.SelectOption
-import dev.minn.jda.ktx.interactions.components.StringSelectMenu
 import dev.minn.jda.ktx.interactions.components.row
 import dev.minn.jda.ktx.messages.*
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent

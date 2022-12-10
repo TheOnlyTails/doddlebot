@@ -1,14 +1,11 @@
 package com.theonlytails.doddlebot
 
-import net.dv8tion.jda.api.entities.emoji.Emoji
 
-const val doddlecordId = 337013993669656586L
-
+@Suppress("SpellCheckingInspection")
 enum class Role(
     val roleName: String,
     val type: Type,
     val id: String,
-    val devId: String = id
 ) {
     HeHim("He/Him", Type.Pronouns, "399633081155452939"),
     SheHer("She/Her", Type.Pronouns, "399633116739665940"),
