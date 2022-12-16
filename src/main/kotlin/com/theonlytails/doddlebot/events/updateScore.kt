@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.MessageType
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 fun JDA.updateScore() = listener<MessageReceivedEvent> {
-    val usersTable = client.postgrest["users"]
+    val usersTable = client.postgrest[User.table]
 
     val user = usersTable.getBy(User::discordId, it.author.idLong)
 

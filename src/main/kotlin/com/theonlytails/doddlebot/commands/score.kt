@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.User as JDAUser
 val score: CommandAction = {
     val userOption = getOption<JDAUser>("member") ?: user
 
-    val score = client.postgrest["users"]
+    val score = client.postgrest[User.table]
         .select { User::discordId eq userOption.idLong }
         .decodeList<User>()
         .first()

@@ -12,7 +12,7 @@ import io.github.jan.supabase.postgrest.postgrest
 val leaderboard: CommandAction = {
     val amount = getOption<Int>("amount") ?: 10
 
-    val users = client.postgrest["users"]
+    val users = client.postgrest[User.table]
         .select()
         .decodeList<User>()
         .asSequence()
@@ -25,8 +25,8 @@ val leaderboard: CommandAction = {
 
         users.forEachIndexed { index, user ->
             field {
-                name = "${index + 1}. ${user.name}"
-                value = "${user.score} points"
+                name = "#${index + 1}"
+                value = "<@!${user.discordId}>: ${user.score} points"
                 inline = false
             }
         }

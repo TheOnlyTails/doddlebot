@@ -20,7 +20,11 @@ data class User(
     val name: String,
     val score: Int = 0,
     val discordId: Long
-)
+) {
+    companion object {
+        const val table = "users"
+    }
+}
 
 object UUIDSerializer : KSerializer<UUID> {
     override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
